@@ -88,3 +88,12 @@ CmdPeriod.add({(0..127).do{arg n; m.noteOff(1, n)}});
 
 // Cleans up the MIDIClient
 MIDIClient.disposeClient;
+
+
+/* BASED ON
+elgiano on scsynth.org
+https://scsynth.org/t/approaches-to-recording-generated-midi-in-daw/2326/11
+
+Eli FieldSteel on youtube.com
+https://www.youtube.com/watch?v=ih2uqOaqb4c&list=PLPYzvS8A_rTaNDweXe6PX4CXSGq4iEWYC&index=19
+*/
