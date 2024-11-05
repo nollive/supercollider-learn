@@ -73,8 +73,6 @@ SynthDef(\reverb, {
 ~reverbBus = Bus.audio(s,2);
 ~reverbSynth = Synth(\reverb, [\in, ~reverbBus]);
 
-tonePan
-
 
 
 (
@@ -105,6 +103,7 @@ SynthDef.new(\tone, { // def UGen
 ~toneSus = 0.5;
 ~toneRel = 1.0;
 ~tonePan = 0.0;
+~faderAmp = 1.0;
 (
 MIDIdef.noteOn(key: \noteOn, func: {
 	arg vel, nn, chan, src; // CAUTION THERE IS ORDER
@@ -120,6 +119,7 @@ MIDIdef.noteOn(key: \noteOn, func: {
 			\sus, ~toneSus,
 			\rel, ~toneRel,
 			\pan, ~tonePan,
+			\amp, ~faderAmp,
 	]);
 
 });
@@ -232,5 +232,17 @@ MIDIdef.cc(\cc10, {
 }, 10);
 )
 
+
+// Fader - Volume mixer (amp) (CC7)
+~faderAmp = 127.linlin(0, 127, 0, 1);
+(
+MIDIdef.cc(\cc7, {
+	arg val, num, chan, src;
+	// [val, num, chan, src].postln;
+	~faderAmp = val.linlin(0, 127, 0, 1);
+	~notes.do{arg synth; synth.set(\amp, ~faderAmp)};
+	~faderAmp.postln;
+}, 7);
+)
 
 s.boot;
