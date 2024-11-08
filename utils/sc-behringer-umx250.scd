@@ -89,6 +89,7 @@ s.options.memSize_(2.pow(20));
 	~faderAmp = 1.0;
 	~filterResonance = 1.0;
 	~cutoffFreq = 4000;
+	~modulation = 100;
 
 	// MIDI
 
@@ -316,13 +317,81 @@ s.meter;
 // CHANGE FILTER
 ~filterSynth.set(\filterType, 2); // 0 LPF, 1 BPF, 2 HPF
 
+s.quit;
 
 
 
-// CUSTOM SETTINGS
-filter on off
-change type filter(+1 modulo 3
+// CUSTOM SETTINGS TO BE ADDED
 
-	s.quit;
+
+(
+// MODULATION WHEEL (CC1)
+MIDIdef.cc(\cc1, {
+	arg val, num, chan, src;
+	[val, num, chan, src].postln;
+	~modulation = val.linlin(0,127, 0.1, 100);
+	// NEED DESTINATION
+}, 1);
+)
+
+(
+// B1 - DATA INC -1
+MIDIdef.cc(\cc97, {
+		arg val, num, chan, src;
+		// [val, num, chan, src].postln;
+
+	}, 97);
+
+// B2 - DATA INC +1
+MIDIdef.cc(\cc96, {
+		arg val, num, chan, src;
+		// [val, num, chan, src].postln;
+
+	}, 96);
+
+// B3 - SUSTENTO
+MIDIdef.cc(\cc66, {
+		arg val, num, chan, src;
+		// [val, num, chan, src].postln;
+
+	}, 66);
+
+// B4 - SOFT PEDAL
+MIDIdef.cc(\cc67, {
+		arg val, num, chan, src;
+		// [val, num, chan, src].postln;
+
+}, 67);
+
+// B5 - SUSTAIN PEDAL
+MIDIdef.cc(\cc64, {
+		arg val, num, chan, src;
+		// [val, num, chan, src].postln;
+
+	}, 64);
+
+// B6 - PORTA ON/OFF
+MIDIdef.cc(\cc65, {
+		arg val, num, chan, src;
+		// [val, num, chan, src].postln;
+
+	}, 65);
+
+// B7 - VOLUME MUTE
+MIDIdef.cc(\cc7, {
+		arg val, num, chan, src;
+		// [val, num, chan, src].postln;
+
+	}, 7);
+
+// B8 - PAN CENTER (CC10)
+MIDIdef.cc(\cc10, {
+		arg val, num, chan, src;
+		// [val, num, chan, src].postln;
+
+	}, 10);
+)
+
+
 
 	
