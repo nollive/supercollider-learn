@@ -87,6 +87,9 @@ s.options.memSize_(2.pow(20));
 	~toneRel = 1.0;
 	~tonePan = 0.0;
 	~faderAmp = 1.0;
+	~filterResonance = 1.0;
+	~cutoffFreq = 4000;
+
 	// MIDI
 
 	MIDIdef.noteOn(key: \noteOn, func: {
@@ -104,7 +107,7 @@ s.options.memSize_(2.pow(20));
 				\rel, ~toneRel,
 				\pan, ~tonePan,
 				\amp, ~faderAmp,
-				\out, ~bus[\reverb],
+				\out, [~bus[\reverb],~bus[\chorus]],
 			],
 			~mainGrp
 		);
@@ -136,7 +139,7 @@ s.options.memSize_(2.pow(20));
 	// R2 - Chorus Depth (mix) (CC93)
 	MIDIdef.cc(\cc93, {
 		arg val, num, chan, src;
-		[val, num, chan, /*src*/].postln;
+		// [val, num, chan].postln;
 		~chorusDepth = val.linlin(0, 127, 0, 1);
 		~chorusSynth.set(\mix, ~chorusDepth);
 	}, 93);
@@ -153,7 +156,7 @@ s.options.memSize_(2.pow(20));
 	MIDIdef.cc(\cc71, {
 		arg val, num, chan, src;
 		// [val, num, chan, src].postln;
-		~filterResonance = val.linlin(0, 127, 0, 1);
+		~filterResonance = val.linlin(0, 127, 0.001, 1);
 		~filterSynth.set(\res, ~filterResonance);
 	}, 71);
 
@@ -181,11 +184,12 @@ s.options.memSize_(2.pow(20));
 		~toneRel.postln;
 	}, 72);
 
-	// R8 - Pan (pan) (CC10) - NEED FI
+	// R8 - Pan (pan) (CC10)
 	MIDIdef.cc(\cc10, {
 		arg val, num, chan, src;
 		// [val, num, chan, src].postln;
 		~tonePan = val.linlin(0, 127, -1, 1);
+		~notes.do{arg synth; synth.set(\pan, ~tonePan)};
 		~tonePan.postln;
 	}, 10);
 
@@ -268,7 +272,7 @@ s.waitForBoot({
 		arg freq=440, amp=0.3, gate=0, bend=0, out=0,
 		atk=0.01, decay=0.3, sus=0.5, rel=1.0, pan=0.0;
 		var sig, env;
-		sig = LFTri.ar(freq * bend.midiratio)!2; //convert from semitones to a frequency ratio
+		sig = LFTri.ar(freq * bend.midiratio); //convert from semitones to a frequency ratio
 		env = EnvGen.kr(
 			Env.adsr(
 				atk, decay, sus, rel
@@ -300,21 +304,25 @@ s.waitForBoot({
 s.plotTree;
 s.meter;
 
-// m = MIDIOut.new(port: 0);
-// m.noteOn(chan:0, note: 60, veloc:100);
-// m.noteOff(chan:0, note: 60, veloc:100);
-//
-// (
-// Synth.new(\tone,
-// 	[
-// 		\freq, 400,
-// 		\amp, 0.8,
-// 		\gate, 1,
-// 		\out, ~bus[\reverb],
-// 	],
-// 	~mainGrp
-// );
-// )
+// CHANGE OUTPUT OF REVERB AND CHORUS
+// TO FILTER
+~reverbSynth.set(\out, ~bus[\filter]);
+~chorusSynth.set(\out, ~bus[\filter]);
 
-s.quit;
-MIDIClient.disposeClient;
+// TO OUTPUT
+~reverbSynth.set(\out, ~out);
+~chorusSynth.set(\out, ~out);
+
+// CHANGE FILTER
+~filterSynth.set(\filterType, 2); // 0 LPF, 1 BPF, 2 HPF
+
+
+
+
+// CUSTOM SETTINGS
+filter on off
+change type filter(+1 modulo 3
+
+	s.quit;
+
+	
